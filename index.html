@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d18">
+<meta name="description" content="Documentação e downloads da biblioteca PS/2 bare metal em C para teclado e mouse.">
+<title>PS/2 API | Bare Metal</title>
+
+<style>
+:root {
+    --bg: #080d18;
+    --panel: #111a2b;
+    --panel2: #17243a;
+    --blue: #3987ff;
+    --cyan: #43d9e8;
+    --text: #edf4ff;
+    --muted: #9aabc4;
+    --border: #263750;
+    --green: #55d99a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.65;
+}
+
+a {
+    color: var(--cyan);
+    text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #080d18ee;
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+}
+
+nav {
+    max-width: 1150px;
+    margin: auto;
+    padding: 15px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 19px;
+    font-weight: 800;
+    color: white;
+}
+
+.logo span { color: var(--blue); }
+
+.navlinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 13px;
+}
+
+.navlinks a { color: var(--muted); }
+
+.hero {
+    max-width: 1150px;
+    margin: auto;
+    padding: 100px 22px 80px;
+}
+
+.tag {
+    display: inline-block;
+    background: #3987ff20;
+    color: #72aaff;
+    border: 1px solid #3987ff55;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+h1 {
+    font-size: clamp(38px, 7vw, 68px);
+    line-height: 1.12;
+    margin: 25px 0;
+    letter-spacing: -2px;
+}
+
+h1 span { color: var(--blue); }
+
+.hero p {
+    color: var(--muted);
+    max-width: 680px;
+    font-size: 18px;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    background: var(--blue);
+    color: white;
+    border: 1px solid var(--blue);
+    cursor: pointer;
+}
+
+.btn.secondary {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.btn:hover {
+    filter: brightness(1.15);
+    text-decoration: none;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 55px;
+}
+
+.stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.stat strong {
+    display: block;
+    color: var(--cyan);
+    font-size: 25px;
+}
+
+.stat small { color: var(--muted); }
+
+section {
+    max-width: 1150px;
+    margin: auto;
+    padding: 65px 22px;
+    scroll-margin-top: 75px;
+}
+
+.section-title {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.section-desc {
+    color: var(--muted);
+    margin-bottom: 30px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 17px;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 23px;
+}
+
+.card h3 {
+    margin-bottom: 9px;
+    color: white;
+}
+
+.card p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.icon {
+    font-size: 26px;
+    margin-bottom: 12px;
+}
+
+.download {
+    background: linear-gradient(135deg, #122c52, #111a2b);
+    border: 1px solid #315b91;
+    border-radius: 16px;
+    padding: 30px;
+}
+
+.file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    background: #080d18;
+    border: 1px solid var(--border);
+    padding: 17px;
+    border-radius: 9px;
+    margin-top: 13px;
+}
+
+.file span { font-weight: bold; }
+
+.file small {
+    display: block;
+    color: var(--muted);
+    font-weight: normal;
+}
+
+pre {
+    background: #050912;
+    border: 1px solid var(--border);
+    padding: 20px;
+    overflow-x: auto;
+    border-radius: 10px;
+    margin: 17px 0;
+    color: #a9d8ff;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+code { font-family: Consolas, monospace; }
+
+.notice {
+    padding: 18px;
+    background: #43d9e810;
+    border-left: 3px solid var(--cyan);
+    border-radius: 6px;
+    margin: 20px 0;
+    color: var(--muted);
+}
+
+.warning {
+    padding: 18px;
+    background: #ffb34712;
+    border-left: 3px solid #ffb347;
+    border-radius: 6px;
+    margin: 20px 0;
+    color: var(--muted);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: var(--panel);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 13px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+th { background: var(--panel2); }
+td { color: var(--muted); }
+
+kbd {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: white;
+}
+
+ul {
+    padding-left: 22px;
+    color: var(--muted);
+}
+
+footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+}
+
+footer strong { color: white; }
+
+@media(max-width:650px) {
+    .navlinks { display: none; }
+    .hero { padding-top: 70px; }
+    .file {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    table { font-size: 13px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<nav>
+    <div class="logo">PS/2 <span>API</span></div>
+    <div class="navlinks">
+        <a href="#sobre">Sobre</a>
+        <a href="#downloads">Downloads</a>
+        <a href="#instalacao">Instalação</a>
+        <a href="#teclado">Teclado</a>
+        <a href="#mouse">Mouse</a>
+        <a href="#ajuda">Ajuda</a>
+    </div>
+</nav>
+</header>
+
+<main>
+
+<!-- HERO -->
+
+<div class="hero">
+    <span class="tag">BARE METAL • C • X86</span>
+
+    <h1>PS/2 sem complicação.<br>
+    <span>Controle total.</span></h1>
+
+    <p>
+        Uma biblioteca simples para comunicação com teclado
+        e mouse PS/2 em sistemas operacionais bare metal.
+        Integre os dispositivos ao seu kernel sem precisar
+        implementar toda a comunicação do zero.
+    </p>
+
+    <div class="buttons">
+        <a class="btn" href="#downloads">Baixar biblioteca ↓</a>
+        <a class="btn secondary" href="#documentacao">Documentação</a>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <strong>C</strong>
+            <small>Implementação nativa</small>
+        </div>
+        <div class="stat">
+            <strong>x86</strong>
+            <small>Arquitetura alvo</small>
+        </div>
+        <div class="stat">
+            <strong>2</strong>
+            <small>Dispositivos PS/2</small>
+        </div>
+        <div class="stat">
+            <strong>0</strong>
+            <small>Dependências externas</small>
+        </div>
+    </div>
+</div>
+
+<!-- SOBRE -->
+
+<section id="sobre">
+    <h2 class="section-title">Sobre o projeto</h2>
+    <p class="section-desc">
+        Uma interface para uma das partes fundamentais
+        do desenvolvimento de sistemas operacionais.
+    </p>
+
+    <div class="grid">
+        <div class="card">
+            <div class="icon">⌨️</div>
+            <h3>Teclado PS/2</h3>
+            <p>
+                Leitura de scancodes, conversão para caracteres,
+                modificadores e layouts de teclado.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">🖱️</div>
+            <h3>Mouse PS/2</h3>
+            <p>
+                Movimento, botões e informações de rolagem
+                quando o dispositivo oferece suporte.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">⚙️</div>
+            <h3>Bare Metal</h3>
+            <p>
+                Comunicação direta com as portas de I/O
+                do controlador PS/2.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">🧩</div>
+            <h3>API simples</h3>
+            <p>
+                Funções para obter informações dos dispositivos
+                sem manipular portas diretamente no kernel.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- DOWNLOADS -->
+
+<section id="downloads">
+    <h2 class="section-title">Downloads</h2>
+    <p class="section-desc">
+        Baixe os arquivos necessários para utilizar a biblioteca.
+    </p>
+
+    <div class="download">
+        <div class="file">
+            <span>📄 ps2.c
+                <small>Implementação do driver</small>
+            </span>
+            <a class="btn" href="./ps2.c" download>Baixar</a>
+        </div>
+
+        <div class="file">
+            <span>📄 ps2.h
+                <small>Interface e estruturas públicas</small>
+            </span>
+            <a class="btn" href="./ps2.h" download>Baixar</a>
+        </div>
+    </div>
+
+  
+</section>
+
+<!-- INSTALAÇÃO -->
+
+<section id="instalacao">
+    <h2 class="section-title">Instalação</h2>
+    <p class="section-desc">
+        Integre os arquivos ao seu projeto.
+    </p>
+
+    <h3>Estrutura sugerida</h3>
+
+    <pre><code>MeuKernel/
+├── kernel.c
+├── ps2.c
+├── ps2.h
+└── Makefile</code></pre>
+
+    <h3>Incluindo o cabeçalho</h3>
+
+    <pre><code>#include "ps2.h"</code></pre>
+
+    <h3>Compilação</h3>
+
+    <p class="section-desc">
+        Compile ps2.c junto aos demais arquivos do kernel,
+        utilizando as opções apropriadas ao seu ambiente
+        freestanding.
+    </p>
+</section>
+
+<!-- DOCUMENTAÇÃO GERAL -->
+
+<section id="documentacao">
+    <h2 class="section-title">Documentação da API</h2>
+    <p class="section-desc">
+        Principais funções e conceitos da biblioteca.
+    </p>
+
+    <table>
+        <tr>
+            <th>Função</th>
+            <th>Descrição</th>
+        </tr>
+        <tr>
+            <td><code>InitPS2()</code></td>
+            <td>Inicializa o controlador e os dispositivos.</td>
+        </tr>
+        <tr>
+            <td><code>ReadPS2()</code></td>
+            <td>Processa os bytes disponíveis do teclado e mouse.</td>
+        </tr>
+        <tr>
+            <td><code>GetKeyboardInfo(&amp;kbd)</code></td>
+            <td>Obtém informações do teclado.</td>
+        </tr>
+        <tr>
+            <td><code>GetMouseInfo(&amp;mouse)</code></td>
+            <td>Obtém informações do mouse.</td>
+        </tr>
+        <tr>
+            <td><code>LayoutKbdPS2(layout)</code></td>
+            <td>Seleciona o layout de teclado.</td>
+        </tr>
+    </table>
+
+    <h3 style="margin-top:35px">Layouts</h3>
+
+    <div class="grid" style="margin-top:15px">
+        <div class="card">
+            <h3>ABNT2</h3>
+            <p>Layout brasileiro com tecla Ç e combinações de acentuação.</p>
+        </div>
+        <div class="card">
+            <h3>ABNT</h3>
+            <p>Layout brasileiro tradicional.</p>
+        </div>
+        <div class="card">
+            <h3>US</h3>
+            <p>Layout americano.</p>
+        </div>
+    </div>
+
+    <pre><code>LayoutKbdPS2(ABNT2);
+LayoutKbdPS2(ABNT);
+LayoutKbdPS2(US);</code></pre>
+</section>
+
+<!-- TECLADO -->
+
+<section id="teclado">
+    <h2 class="section-title">Desenvolvimento com teclado</h2>
+    <p class="section-desc">
+        Entenda a diferença entre caracteres ASCII e códigos
+        físicos de teclas.
+    </p>
+
+    <div class="notice">
+        <strong>Conceito fundamental:</strong>
+        asciiKey representa o caractere produzido pela tecla.
+        ps2key representa o código da tecla recebido pelo driver.
+        Uma tecla especial pode não produzir nenhum caractere ASCII.
+    </div>
+
+    <h3>1. Lendo caracteres</h3>
+
+    <pre><code>PS2KeyboardInfo kbd;
+
+while (1) {
+    ReadPS2();
+    GetKeyboardInfo(&amp;kbd);
+
+    if (kbd.asciiKey != 0) {
+        // Existe um caractere para processar
+        putchar(kbd.asciiKey);
+    }
+}</code></pre>
+
+    <h3>2. Identificando teclas especiais</h3>
+
+    <p class="section-desc">
+        Para identificar uma tecla física, utilize ps2key,
+        não asciiKey.
+    </p>
+
+    <pre><code>if (kbd.ps2key == 0xE048) {
+    // Seta para cima
+}
+
+if (kbd.ps2key == 0xE050) {
+    // Seta para baixo
+}
+
+if (kbd.ps2key == 0xE04B) {
+    // Seta para esquerda
+}
+
+if (kbd.ps2key == 0xE04D) {
+    // Seta para direita
+}</code></pre>
+
+    <h3>3. Tabela das setas</h3>
+
+    <table>
+        <tr>
+            <th>Tecla</th>
+            <th>Scancode de 16 bits</th>
+        </tr>
+        <tr><td>↑ Cima</td><td>0xE048</td></tr>
+        <tr><td>↓ Baixo</td><td>0xE050</td></tr>
+        <tr><td>← Esquerda</td><td>0xE04B</td></tr>
+        <tr><td>→ Direita</td><td>0xE04D</td></tr>
+    </table>
+
+    <div class="notice">
+        Os códigos acima consideram Scan Code Set 1 e a
+        representação de 16 bits em que E0 ocupa o byte superior.
+        A comparação depende de o driver preservar o prefixo
+        estendido em ps2key.
+    </div>
+
+    <h3>4. Exemplo: movimentação de personagem</h3>
+
+    <pre><code>if (kbd.keyPress) {
+    switch (kbd.ps2key) {
+        case 0xE048:
+            player_y--;
+            break;
+
+        case 0xE050:
+            player_y++;
+            break;
+
+        case 0xE04B:
+            player_x--;
+            break;
+
+        case 0xE04D:
+            player_x++;
+            break;
+    }
+}</code></pre>
+
+    <h3>5. Identificando letras</h3>
+
+    <pre><code>if (kbd.asciiKey == 'a') {
+    // Letra A
+}
+
+if (kbd.asciiKey == 'z') {
+    // Letra Z
+}</code></pre>
+
+    <h3>6. Modificadores</h3>
+
+    <pre><code>if (kbd.mod.CTRL_ON) {
+    // Ctrl pressionado
+}
+
+if (kbd.mod.SHIFT_ON) {
+    // Shift pressionado
+}
+
+if (kbd.mod.CAPS_ON) {
+    // Caps Lock ativado
+}
+
+if (kbd.mod.ALT_ON) {
+    // Alt pressionado
+}
+
+if (kbd.mod.ALTGR_ON) {
+    // AltGr pressionado
+}</code></pre>
+
+    <h3>7. Teclas mortas</h3>
+
+    <p class="section-desc">
+        Teclas de acentuação podem aguardar a próxima tecla
+        para formar um caractere composto.
+    </p>
+
+    <table>
+        <tr><th>Tecla</th><th>Nome</th><th>Exemplo</th></tr>
+        <tr><td>´</td><td>Dead Acute</td><td>á, é</td></tr>
+        <tr><td>`</td><td>Dead Grave</td><td>à</td></tr>
+        <tr><td>^</td><td>Dead Circumflex</td><td>â, ê</td></tr>
+        <tr><td>~</td><td>Dead Tilde</td><td>ã, õ</td></tr>
+        <tr><td>¨</td><td>Dead Diaeresis</td><td>ü</td></tr>
+    </table>
+</section>
+
+<!-- MOUSE -->
+
+<section id="mouse">
+    <h2 class="section-title">Desenvolvimento com mouse</h2>
+    <p class="section-desc">
+        Receba informações de movimento, botões e roda
+        de rolagem para desenvolver interfaces gráficas.
+    </p>
+
+    <h3>1. Obtendo informações</h3>
+
+    <pre><code>PS2MouseInfo mouse;
+
+ReadPS2();
+GetMouseInfo(&amp;mouse);</code></pre>
+
+    <h3>2. Campos do mouse</h3>
+
+    <table>
+        <tr>
+            <th>Campo</th>
+            <th>Descrição</th>
+        </tr>
+        <tr><td>mouse.x</td><td>Movimento horizontal.</td></tr>
+        <tr><td>mouse.y</td><td>Movimento vertical.</td></tr>
+        <tr><td>mouse.scroll</td><td>Movimento da roda.</td></tr>
+        <tr><td>mouse.left</td><td>Estado do botão esquerdo.</td></tr>
+        <tr><td>mouse.right</td><td>Estado do botão direito.</td></tr>
+        <tr><td>mouse.middle</td><td>Estado do botão central.</td></tr>
+        <tr><td>mouse.packetReady</td><td>Indica pacote recebido.</td></tr>
+    </table>
+
+    <h3>3. Movimentando o cursor</h3>
+
+    <pre><code>PS2MouseInfo mouse;
+
+while (1) {
+    ReadPS2();
+    GetMouseInfo(&amp;mouse);
+
+    if (mouse.packetReady) {
+        cursor_x += mouse.x;
+        cursor_y += mouse.y;
+
+        // Atualizar o cursor na tela
+    }
+}</code></pre>
+
+    <h3>4. Detectando os botões</h3>
+
+    <pre><code>if (mouse.left) {
+    // Botão esquerdo pressionado
+}
+
+if (mouse.right) {
+    // Botão direito pressionado
+}
+
+if (mouse.middle) {
+    // Botão central pressionado
+}</code></pre>
+
+    <h3>5. Utilizando a roda</h3>
+
+    <pre><code>if (mouse.scroll > 0) {
+    // Rolagem para cima
+}
+
+if (mouse.scroll < 0) {
+    // Rolagem para baixo
+}</code></pre>
+
+    <h3>6. Exemplo de interface gráfica</h3>
+
+    <pre><code>if (mouse.packetReady) {
+
+    cursor_x += mouse.x;
+    cursor_y += mouse.y;
+
+    if (mouse.left) {
+        // Verificar clique em algum componente
+    }
+
+    if (mouse.right) {
+        // Abrir menu de contexto
+    }
+
+    if (mouse.scroll != 0) {
+        // Atualizar posição da rolagem
+    }
+}</code></pre>
+
+    <div class="notice">
+        Os nomes dos campos e os tipos devem corresponder
+        exatamente às estruturas declaradas na versão de ps2.h
+        utilizada. A disponibilidade da roda depende do modo
+        negociado com o mouse.
+    </div>
+</section>
+
+<!-- AJUDA -->
+
+<section id="ajuda">
+    <h2 class="section-title">Ajuda e desenvolvimento</h2>
+    <p class="section-desc">
+        Recomendações para integrar a biblioteca ao seu sistema.
+    </p>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Polling</h3>
+            <p>
+                Chame ReadPS2() frequentemente para processar
+                os bytes recebidos dos dispositivos.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Compatibilidade</h3>
+            <p>
+                A biblioteca exige acesso às portas de I/O x86
+                e um controlador PS/2 disponível ou emulado.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Compilação</h3>
+            <p>
+                Compile em ambiente freestanding x86,
+                utilizando as opções apropriadas ao kernel.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Testes</h3>
+            <p>
+                Teste teclas especiais, layouts, movimento,
+                botões e scroll em emuladores e hardware.
+            </p>
+        </div>
+    </div>
+
+    <h3 style="margin-top:35px">Recomendações</h3>
+
+    <ul>
+        <li>Não bloqueie indefinidamente esperando um byte PS/2.</li>
+        <li>Chame ReadPS2() regularmente.</li>
+        <li>Não confunda caracteres ASCII com scancodes.</li>
+        <li>Considere os limites da tela ao movimentar o cursor.</li>
+        <li>Verifique a disponibilidade de PS/2 no hardware.</li>
+        <li>Confira ps2.h para conhecer os tipos e campos exatos.</li>
+        <li>Teste o driver antes de utilizá-lo em produção.</li>
+    </ul>
+
+    <div class="warning">
+        PS/2 não está presente em todos os computadores modernos.
+        Muitos equipamentos utilizam exclusivamente USB para
+        teclado e mouse. A biblioteca não substitui um driver USB HID.
+    </div>
+</section>
+
+<!-- CRÉDITOS -->
+
+<section id="creditos">
+    <h2 class="section-title">Créditos</h2>
+
+    <div class="card">
+        <h3>PS/2 API — Bare Metal Edition</h3>
+        <p>
+            Biblioteca desenvolvida para facilitar a integração
+            de teclado e mouse PS/2 em sistemas operacionais.
+            Desenvolvida com assistência do ChatGPT no contexto
+            do projeto WaresdesOS.
+        </p>
+
+        <p style="margin-top:15px">
+            Uma ferramenta para desenvolvedores que desejam
+            construir seus próprios sistemas operacionais.
+        </p>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <strong>PS/2 API</strong><br>
+    Bare Metal Edition · C · x86<br>
+    Desenvolvido com assistência de IA.<br><br>
+    Deus seja louvado.
+</footer>
+
+</body>
+</html>
